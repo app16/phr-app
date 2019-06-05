@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import {withRouter} from "react-router-dom";
 import { withAuth } from '@okta/okta-react';
 
-export default withAuth(class Homepage extends Component {
+export default withRouter ( withAuth(class Homepage extends Component {
   constructor(props) {
     super(props);
     this.state = { authenticated: null };
@@ -20,29 +21,40 @@ export default withAuth(class Homepage extends Component {
 
   async componentDidMount() {
     this.checkAuthentication();
+    
+  }
 
-        fetch('https://dev-357341.okta.com/api/v1/users/me',{
+  async componentDidUpdate() {
+    this.checkAuthentication();
+    this.props.auth.getUser().then(res =>{
+      console.log(res.email);
+      const email = res.email;
+      fetch('https://dev-357341.okta.com/api/v1/users/'+email,{
             method:'get',
             headers:{
               Accept: 'application/json',
               'Content-Type': 'application/json',
               'Access-Control-Allow-Origin':'*',
-              'Custom-Allowed-Origin-Header-1':'http://161.85.83.195:3000/Homepage',
+              'Custom-Allowed-Origin-Header-1':'http://130.147.175.222:8092/Homepage',
               Authorization: 'SSWS 00lVxvLE_yLY68atO_Qj6dKFcdvb0QqqPke4G_WYSC'        
             },
             json: true   
           }).then(response => {
             return response.json();    
           }).then(res =>{
-            console.log(res);      
-          });        
-
-  }
-
-  async componentDidUpdate() {
-    this.checkAuthentication();
-    const user = this.props.auth.getCurrentUser();
-    console.log(user);
+            const usertype = res.profile.UserType;
+            console.log(res.profile.UserType);    
+            if (usertype === 'Patient' )
+              this.props.history.push("/HomepagePatient");      
+            else if(usertype !== 'Patient') 
+              this.props.history.push("/HomepageProvider");     
+            return usertype; 
+          }); 
+          
+          return res;
+    });
+    
+    
     
   }
 
@@ -70,4 +82,4 @@ export default withAuth(class Homepage extends Component {
       </div>
     );
   }
-});
+}));

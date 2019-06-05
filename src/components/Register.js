@@ -9,6 +9,7 @@ class Register extends Component {
       firstname:'',
       lastname:'',
       usertype:'',
+      username : '',
       password:'',
       email:''
     };
@@ -33,16 +34,16 @@ class Register extends Component {
         Accept: 'application/json',
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin':'*',
-        'Custom-Allowed-Origin-Header-1':'http://161.85.83.195:3000/Register',
+        'Custom-Allowed-Origin-Header-1':'http://130.147.175.222:8092/Register',
         Authorization: 'SSWS 00lVxvLE_yLY68atO_Qj6dKFcdvb0QqqPke4G_WYSC'        
       },
       body: JSON.stringify({
         profile:{
-          firstName:this.state.firstname,
-          lastName:this.state.lastname,
-          email:this.state.email,
-          login:this.state.email,
-          UserType:this.state.usertype
+          firstName :this.state.firstname,
+          lastName :this.state.lastname,
+          email :this.state.email,
+          login :this.state.username,
+          UserType :this.state.usertype
         },
         credentials:{
           password:{value:this.state.pass}
@@ -50,12 +51,28 @@ class Register extends Component {
       }),
       json: true   
     }).then(response => {
-      return response.json();    
+      return response.json();
     }).then(res =>{
-      console.log(res);      
+      console.log(res);
+      console.log("calling fabric register api");
+      var usernameparam = 'userID='+this.state.username;
+      var usertypeparam = 'userType='+this.state.usertype;
+        fetch('http://130.147.175.222:8099/register?'+`${usernameparam}`+'&'+`${usertypeparam}`,{
+               method: 'get',
+               headers: {'Access-Control-Allow-Origin':'*'}
+             }).then(res =>{if (res.status>=200 && res.status<300) {
+                  console.log("register in fabric");
+                  console.log(res);
+                }
+              else {
+                  console.log('sometihng went wrong');
+              }
+            });
+      this.props.history.push("/Login");      
     });   
     
   }
+  
 
   render() {
     return (
@@ -77,6 +94,12 @@ class Register extends Component {
           <label className="col-sm-2 col-form-label">Last Name</label>
           <div className="col-sm-3">
               <input type="text" className="form-control" name="lastname" placeholder="Last Name" onChange={this.handleChange}></input>
+          </div>
+      </div>
+      <div className="form-group row">
+          <label className="col-sm-2 col-form-label">User Name</label>
+          <div className="col-sm-3">
+              <input type="text" className="form-control" name="username" placeholder="User Name" onChange={this.handleChange}></input>
           </div>
       </div>
       <div className="form-group row">
