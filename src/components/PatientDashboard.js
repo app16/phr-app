@@ -1,15 +1,13 @@
 import React from "react";
 //import Img from 'react-image';
 import {withRouter} from "react-router-dom";
-import { Icon } from 'react-icons-kit';
-import {edit} from 'react-icons-kit/feather/edit';
 import Nav from "./layouts/Nav";
 import ProfileBar from "./layouts/ProfileBar";
+import { withAuth } from '@okta/okta-react';
 
-const param="patID=PA3";
-const patID="PA3";
+var param=null;
 const patData=[];
-
+var username=null;
 const blockdata =[];
 
 const TableRow1 = ({ SrNo, MedID, Medname, Dosage, Frequency}) => {
@@ -71,24 +69,32 @@ const TableRow1 = ({ SrNo, MedID, Medname, Dosage, Frequency}) => {
     sesDate:'',
     proID:'',
     comms:''
+    
   };
   this.handleInputChange = this.handleInputChange.bind(this);
-  this.componentDidMount = this.componentDidMount.bind(this);
+  this.componentWillMount = this.componentWillMount.bind(this);
   this.putblockdata = this.putblockdata.bind(this);
   this.uploadMedication = this.uploadMedication.bind(this);
   this.uploadHistory = this.uploadHistory.bind(this);
   this.uploadLifestyle = this.uploadLifestyle.bind(this);
-
-
 }
-componentDidMount(){
-  fetch('http://130.147.175.222:8099/querypatdb?'+`${param}`,{
+
+componentWillMount(){
+  patData.length=0;
+  blockdata.length=0;
+  this.props.auth.getUser().then(res =>{
+    console.log(res);
+    username = res.preferred_username;
+    console.log(username);
+    param="patID="+username;       
+  }).then(()=>{
+    fetch('http://130.147.175.222:8099/querypatdb?'+`${param}`,{
      method: 'get'
    }).then(res =>{if (res.status>=200 && res.status<300) {
      return res.json();
   }
  else {
-   console.log('sometihng went wrong');
+   console.log('sometihng went wrong11');
       }
     }).then(function (json){
 
@@ -113,20 +119,27 @@ componentDidMount(){
         }
       }
       console.log(patData);
-
       }
-    );
-    this.putblockdata();
+    ).then(()=>{
+      console.log(param);
+      this.putblockdata();
+    });
+  });
+
+  
+    
 }
 
   putblockdata(){
-    fetch('http://130.147.175.222:8099/chaindashboard',{
+    console.log(param);
+    
+    fetch('http://130.147.175.222:8099/chaindashboard?'+`${param}`,{
      method: 'get'
    }).then(res =>{if (res.status>=200 && res.status<300) {
      return res.json();
   }
  else {
-   console.log('sometihng went wrong');
+   console.log('something went wrong22');
       }
     }).then(function (json){
       var count = 1;
@@ -153,7 +166,7 @@ componentDidMount(){
   uploadMedication(){
     console.log('The submit button was clicked. ');
     var payload = {
-      "patID" : 'PA3',
+      "patID" : username,
       "med": this.state.medname,
       "dos": this.state.dosage,
       "freq": this.state.frequency
@@ -177,7 +190,7 @@ componentDidMount(){
   uploadHistory(){
     console.log('The submit button was clicked. ');
     var payload = {
-      "patID" : 'PA3',
+      "patID" : username,
       "sesDate": this.state.sesDate,
       "proID": this.state.proID,
       "comm": this.state.comms
@@ -201,7 +214,7 @@ componentDidMount(){
   uploadLifestyle(){
     console.log('The submit button was clicked. ');
     var payload = {
-      "patID" : 'PA3',
+      "patID" : username,
       "steps": this.state.steps,
       "sleep": this.state.sleep,
       "cals": this.state.cals
@@ -466,4 +479,4 @@ componentDidMount(){
     );
   }
 }
-export default withRouter(Dashboard);
+export default withRouter(withAuth(Dashboard));

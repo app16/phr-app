@@ -13,10 +13,10 @@ export default class Nav extends React.Component {
         <nav className="navbar navbar-expand-lg navbar-light bg-light " >  
               <ul className="navbar-nav mr-auto">              
                 <li>
-                  <Link to={"/Patient/Dashboard"} className="nav-link">Dashboard</Link>
+                  <Link to={"/Provider/Dashboard"} className="nav-link">Dashboard</Link>
                 </li>
                 <li>
-                  <Link to={"/Patient/Permissions"} className="nav-link">Permissions</Link>
+                  <Link to={"/Provider/Permissions"} className="nav-link">Permissions</Link>
                 </li>
               </ul>
         </nav>

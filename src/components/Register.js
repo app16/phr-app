@@ -28,7 +28,7 @@ class Register extends Component {
   }
   createUser = () => {
     console.log(this.state);
-    fetch('https://dev-357341.okta.com/api/v1/users',{
+    fetch('https://dev-357341.okta.com/api/v1/users?activate=true',{
       method:'post',
       headers:{
         Accept: 'application/json',
@@ -46,7 +46,7 @@ class Register extends Component {
           UserType :this.state.usertype
         },
         credentials:{
-          password:{value:this.state.pass}
+          password:{value:this.state.password}
         }
       }),
       json: true   

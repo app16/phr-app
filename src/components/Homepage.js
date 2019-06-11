@@ -27,9 +27,9 @@ export default withRouter ( withAuth(class Homepage extends Component {
   async componentDidUpdate() {
     this.checkAuthentication();
     this.props.auth.getUser().then(res =>{
-      console.log(res.email);
-      const email = res.email;
-      fetch('https://dev-357341.okta.com/api/v1/users/'+email,{
+      console.log(res);
+      const login = res.preferred_username;
+      fetch('https://dev-357341.okta.com/api/v1/users/'+login,{
             method:'get',
             headers:{
               Accept: 'application/json',
@@ -42,12 +42,14 @@ export default withRouter ( withAuth(class Homepage extends Component {
           }).then(response => {
             return response.json();    
           }).then(res =>{
+            console.log(res.profile);
+            
             const usertype = res.profile.UserType;
             console.log(res.profile.UserType);    
             if (usertype === 'Patient' )
-              this.props.history.push("/HomepagePatient");      
+              this.props.history.push("/Patient/Dashboard");      
             else if(usertype !== 'Patient') 
-              this.props.history.push("/HomepageProvider");     
+              this.props.history.push("/Provider/Dashboard");     
             return usertype; 
           }); 
           
